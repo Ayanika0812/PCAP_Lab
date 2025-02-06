@@ -47,5 +47,17 @@ int main(){
 
 
 /*
+student@lpcp-19:~/220905128/lab5$ nvcc q3.cu -o q3
+^[[Astudent@lpcp-19:~/220905128/lab5$ ./q3
+Enter the size of the array: 4
+Enter angles in rad: 2.14 4.3 8.9 3.14
+Unused : 252   
+Result : 
+sine(2.140000) -> 0.842330  
+sine(4.300000) -> -0.916166  
+sine(8.900000) -> 0.501021  
+sine(3.140000) -> 0.001593  
+
+Reg no. 220905128
 
 */
