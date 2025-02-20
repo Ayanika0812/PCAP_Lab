@@ -1,0 +1,33 @@
+1)
+1D SEQUENTICAL CONVULATION
+
+mask over all  -> find sum of products  -> replaced 
+convulation is parallel , one mask
+
+3, 5 ->min mask size(odd)
+boundary  ->put default values (0){wont effect the sum}
+
+evry thread i ->convu
+
+
+atleast 10 elements, 
+usually hardcode 
+
+
+
+
+
+2)sorting
+
+
+
+__syncthreads();
+
+
+3)
+flag for odd or even
+
+
+or inside loop
+	even kernel and odd kernel
+	
