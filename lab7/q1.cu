@@ -5,7 +5,7 @@
 #define MAX_WORDS 1024  
 #define WORD_LENGTH 32  
 
-__device__ bool strcmp_cuda(const char *a, const char *b) {                      
+__device__ bool strcmp_cuda(const char *a, const char *b) {                 //defing own function in cuda -> therefore use device to run in kernel     
     while (*a && (*a == *b)) {
         a++;
         b++;
@@ -14,7 +14,7 @@ __device__ bool strcmp_cuda(const char *a, const char *b) {
 }
 
 __global__ void count_word_kernel(char *words, int num_words, char *target, int *count) {
-    int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    int idx = threadIdx.x + blockIdx.x * blockDim.x;         //1D GRID, 1D BLOCK  size = 256
     if (idx >= num_words) return;
 
     char *word = words + idx * WORD_LENGTH;  
