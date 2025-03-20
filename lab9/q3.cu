@@ -78,3 +78,25 @@ int main()
     cudaFree(dB);
     printf("\nReg No. - 220905128\n");
 }    
+
+/*
+nvcc q3.cu -o q3
+student@lpcp-19:~/220905128/lab9$ ./q3
+Enter Dimensions of Matrix A : 
+4 4
+Enter Matrix A : 
+1 2 3 4
+6 5 8 3
+2 4 10 1
+9 1 2 5
+Matrix A : 
+1 2 3 4 
+6 5 8 3 
+2 4 10 1 
+9 1 2 5 
+Resultant Matrix : 
+1 2 3 4 
+6 10 111 3 
+2 11 101 1 
+9 1 2 5 
+*/
