@@ -1,0 +1,51 @@
+1st row -> same
+
+based o index of row -> elements to the power index
+
+
+2)
+boundary -> same
+center -> elemnts -> find first complement
+
+
+
+2. Write a program in CUDA to read MXN matrix A and replace 1st row of this matrix by same elements, 2nd row elements by square of each element and 3rd row elements by cube of each element and so on.
+
+3. Write a CUDA program that reads a matrix A of size MXN and produce an output matrix B of same size such that it replaces all the non-border elements (numbers in bold) of A with its equivalent 1’s complement and remaining elements same as matrix A.
+
+Example:
+A
+1 2 3 4
+6 5 8 3
+2 4 10 1
+9 1 2 5
+
+B
+1 2 3 4
+6 10 111 3
+2 11 101 1
+9 1 2 5
+Additional Exercises:
+
+1. Write a CUDA program which reads an input matrix A of size MXN and produces an output matrix B of size MXN such that, each element of the output matrix is calculated in parallel. Each element, B[i][j], in the output matrix is obtained by adding the elements in ith row and jth column of the input matrix A.
+
+Example:
+A
+1 2 3
+4 5 6
+
+O/p: 11 13 15
+20 22 24
+
+2. Write a CUDA program that reads a character type matrix A and integer type matrix B of size MXN. It produces an output string STR such that, every character of A is repeated r times (where r is the integer value in matrix B which is having the same index as that of the character taken in A). Write the kernel such that every value of input matrix must be produced required number of times by one thread.
+
+Example:
+A
+p C a P
+e X a M
+
+B
+1 2 4 3
+2 4 3 2
+
+Output String STR: pCCaaaaPPPeeXXXXaaaMM
