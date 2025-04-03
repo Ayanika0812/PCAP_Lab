@@ -8,7 +8,7 @@ typedef struct {
     float price;
 } Item;
 
-__global__ void calculatePurchase(float* purchases, int* itemIndices, const float* itemPrices, int numFriends, int numItems) {
+__global__ void calculatePurchase(float* purchases, int* itemIndices, int* quantities, const float* itemPrices, int numFriends, int numItems) {
     int friendId = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (friendId < numFriends) {
@@ -17,7 +17,8 @@ __global__ void calculatePurchase(float* purchases, int* itemIndices, const floa
         for (int i = 0; i < numItems; i++) {
             int itemId = itemIndices[friendId * numItems + i];
             if (itemId >= 0 && itemId < numItems) {
-                total += itemPrices[itemId];
+                int quantity = quantities[friendId * numItems + i];
+                total += itemPrices[itemId] * quantity;
             }
         }
 
@@ -56,12 +57,14 @@ int main() {
     }
 
     int* itemIndices = (int*)malloc(numFriends * numItems * sizeof(int));
+    int* quantities = (int*)malloc(numFriends * numItems * sizeof(int));  // Array to store quantities
 
     for (int i = 0; i < numFriends; i++) {
         printf("\nEnter the items bought by Friend %d (enter item numbers, 0 to stop):\n", i + 1);
         
         for (int j = 0; j < numItems; j++) {
             itemIndices[i * numItems + j] = -1;
+            quantities[i * numItems + j] = 0;  // Initialize quantities to 0
         }
 
         for (int j = 0; j < numItems; j++) {
@@ -69,47 +72,58 @@ int main() {
             int itemChoice;
             scanf("%d", &itemChoice);
 
-            if (itemChoice == 0) break;
+            if (itemChoice == 0) break;  // Stop if 0 is entered
 
             itemIndices[i * numItems + j] = itemChoice - 1;
+
+            // Ask for the quantity
+            printf("Enter quantity for Item %d: ", itemChoice);
+            int quantity;
+            scanf("%d", &quantity);
+            quantities[i * numItems + j] = quantity;
         }
     }
 
     float* d_purchases;
     int* d_itemIndices;
+    int* d_quantities;
     float* d_itemPrices;
 
     cudaMalloc((void**)&d_purchases, numFriends * sizeof(float));
     cudaMalloc((void**)&d_itemIndices, numFriends * numItems * sizeof(int));
+    cudaMalloc((void**)&d_quantities, numFriends * numItems * sizeof(int));
     cudaMalloc((void**)&d_itemPrices, numItems * sizeof(float));
 
     cudaMemset(d_purchases, 0, numFriends * sizeof(float));
 
     cudaMemcpy(d_itemIndices, itemIndices, numFriends * numItems * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_quantities, quantities, numFriends * numItems * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_itemPrices, &items[0].price, numItems * sizeof(float), cudaMemcpyHostToDevice);
 
     int blockSize = 256;
     int numBlocks = (numFriends + blockSize - 1) / blockSize;
-    calculatePurchase<<<numBlocks, blockSize>>>(d_purchases, d_itemIndices, d_itemPrices, numFriends, numItems);
+    calculatePurchase<<<numBlocks, blockSize>>>(d_purchases, d_itemIndices, d_quantities, d_itemPrices, numFriends, numItems);
 
     float* purchases = (float*)malloc(numFriends * sizeof(float));
     cudaMemcpy(purchases, d_purchases, numFriends * sizeof(float), cudaMemcpyDeviceToHost);
 
     printf("\nTotal purchases made by each friend:\n");
-    float totalPurchase = 0.0f;  // Variable to hold the total purchase by all friends
+    float totalPurchase = 0.0f;
 
     for (int i = 0; i < numFriends; i++) {
         printf("Friend %d: $%.2f\n", i + 1, purchases[i]);
-        totalPurchase += purchases[i];  // Add each friend's total to the overall total
+        totalPurchase += purchases[i];
     }
 
-    printf("\nTotal purchases by all friends: $%.2f\n", totalPurchase);  // Display the total purchase
+    printf("\nTotal purchases by all friends: $%.2f\n", totalPurchase);
 
     cudaFree(d_purchases);
     cudaFree(d_itemIndices);
+    cudaFree(d_quantities);
     cudaFree(d_itemPrices);
 
     free(itemIndices);
+    free(quantities);
     free(purchases);
 
     return 0;
@@ -138,18 +152,24 @@ Shopping Mall Menu:
 
 Enter the items bought by Friend 1 (enter item numbers, 0 to stop):
 Item number to purchase (1 to 10, 0 to stop): 2
+Enter quantity for Item 2: 2
 Item number to purchase (1 to 10, 0 to stop): 3
+Enter quantity for Item 3: 1
 Item number to purchase (1 to 10, 0 to stop): 0
 
 Enter the items bought by Friend 2 (enter item numbers, 0 to stop):
 Item number to purchase (1 to 10, 0 to stop): 2
+Enter quantity for Item 2: 1
 Item number to purchase (1 to 10, 0 to stop): 4
+Enter quantity for Item 4: 3
 Item number to purchase (1 to 10, 0 to stop): 5
+Enter quantity for Item 5: 1
 Item number to purchase (1 to 10, 0 to stop): 0
 
 Total purchases made by each friend:
-Friend 1: $90.00
-Friend 2: $95.00
+Friend 1: $140.00
+Friend 2: $125.00
 
-Total purchases by all friends: $185.00
+Total purchases by all friends: $265.00
+
 */
